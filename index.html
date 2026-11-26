@@ -122,6 +122,37 @@
   .pin { width:28px; height:28px; padding:0; border-radius:50%; border:2px solid #fff; background:#0f8b8d; color:#fff; font:800 13px/24px ui-monospace,Menlo,monospace; cursor:pointer; box-shadow:0 3px 12px rgba(10,80,90,.4); }
   .pin.wait { background:#fff; border-color:#0f8b8d; color:#0b6a6c; }
   .pin.care { background:#7a4ddb; }
+  /* 電腦與平板：面板收成左下角小卡片，把畫面留給地圖 */
+  @media (min-width:760px) {
+    .panel { left:12px; bottom:12px; transform:none; width:316px; max-height:calc(100% - 24px); overflow:auto; border-bottom:1px solid var(--line); border-radius:14px; padding:9px 10px; }
+    .panel::before { left:14px; right:14px; }
+    .panel button, .panel input, .panel select { font-size:13px; }
+    .panel input, .panel select, .panel .btn { height:32px; padding:0 7px; border-radius:8px; }
+    .panel .row { gap:5px; margin-top:5px; }
+    .panel #district { flex-basis:94px; }
+    .tabs { margin-bottom:6px; padding:2px; }
+    .panel .tabs button { height:28px; font-size:12.5px; }
+    .tabs button::before { width:7px; height:7px; margin-right:4px; }
+    .legend { margin-top:5px; gap:4px; font-size:10px; }
+    .legend i { width:36px; }
+    .legend span { display:none; }
+    .panel .legend #btnReplay { height:22px; }
+    .note { margin-top:5px; font-size:10.5px; }
+    #list { max-height:max(110px, calc(100vh - 400px)); margin-top:6px; }
+    #extra { max-height:max(150px, calc(100vh - 250px)); }
+    .maplibregl-ctrl-top-right { top:96px; }
+    h1 { font-size:clamp(22px,3.2vw,36px); }
+  }
+  /* 矮螢幕：縮小標題並收起座標列 */
+  @media (max-height:700px) and (min-width:760px) {
+    .top { padding-top:6px; padding-bottom:20px; }
+    .kicker { font-size:10px; }
+    h1 { font-size:clamp(18px,4.6vh,30px); margin-top:0; }
+    #count { margin-top:2px; padding:1px 12px; font-size:12px; }
+    #count em { font-size:15px; }
+    .hud { display:none; }
+    .maplibregl-ctrl-top-right { top:12px; }
+  }
   #err { display:none; position:absolute; top:40%; left:20px; right:20px; z-index:4; text-align:center; }
 </style>
 </head>
@@ -173,7 +204,12 @@ const map = new maplibregl.Map({ container:'map', style:'https://tiles.openfreem
   pitch:52, bearing:-14, minZoom:7.5, maxZoom:18, localIdeographFontFamily:FONT, attributionControl:{compact:true} });
 map.addControl(new maplibregl.NavigationControl(), 'top-right');
 map.addControl(new maplibregl.GeolocateControl({ positionOptions:{enableHighAccuracy:true}, trackUserLocation:true }), 'top-right');
-new ResizeObserver(() => document.body.style.setProperty('--sheet-h', $('panel').offsetHeight + 'px')).observe($('panel'));
+const WIDE = matchMedia('(min-width: 760px)');
+const sheetH = () => WIDE.matches ? 0 : $('panel').offsetHeight;      // 底部面板佔掉的高度
+const sideW = () => WIDE.matches ? $('panel').offsetWidth + 12 : 0;   // 左側卡片佔掉的寬度
+const focusOffset = (limit, gap) => [sideW() / 2, WIDE.matches ? Math.round(innerHeight * .2) : Math.min(limit, innerHeight/2 - sheetH() - gap)];
+const layout = () => document.body.style.setProperty('--sheet-h', sheetH() + 'px');
+new ResizeObserver(layout).observe($('panel')); WIDE.addEventListener('change', layout);
 
 function hud() {
   const c = map.getCenter();
@@ -279,13 +315,13 @@ function openClinic(c) {
 }
 function go(c) {
   $('list').classList.remove('on'); $('btnList').setAttribute('aria-expanded', 'false'); $('btnList').classList.remove('on');
-  map.flyTo({ center:c.p, zoom:16.5, offset:[0, Math.min(90, innerHeight/2 - $('panel').offsetHeight - 36)] }); openClinic(c);
+  map.flyTo({ center:c.p, zoom:16.5, offset:focusOffset(90, 36) }); openClinic(c);
 }
 
 function fit(list) {
   const pts = list.filter(c => c.p); if (!pts.length) return;
   const b = new maplibregl.LngLatBounds(); pts.forEach(c => b.extend(c.p));
-  map.fitBounds(b, { padding:{ top:140, bottom:$('panel').offsetHeight + 20, left:30, right:50 }, maxZoom:15.5, pitch:tilted?52:0, bearing:tilted?-14:0 });
+  map.fitBounds(b, { padding:{ top:140, bottom:sheetH() + 20, left:sideW() + 30, right:50 }, maxZoom:15.5, pitch:tilted?52:0, bearing:tilted?-14:0 });
 }
 function districtLabels() {
   markers.forEach(m => m.remove()); markers = [];
@@ -325,7 +361,7 @@ const mapLink = (n, a) => `<a target="_blank" rel="noopener" href="https://www.g
 const telLink = t => `<a href="tel:${t.replace(/[^\d]/g, '')}">${esc(t)}</a>`;
 function showSpot(x, html) {
   popup?.remove();
-  map.flyTo({ center:x.p, zoom:15.5, offset:[0, Math.min(60, innerHeight/2 - $('panel').offsetHeight - 40)], duration:1400 });
+  map.flyTo({ center:x.p, zoom:15.5, offset:focusOffset(60, 40), duration:1400 });
   popup = new maplibregl.Popup({ maxWidth:'280px', offset:16 }).setLngLat(x.p).setHTML(`<div class="pop">${html}</div>`).addTo(map);
 }
 function addPin(x, label, cls, html) {
@@ -390,7 +426,7 @@ function setMode(next) {
   if (mode === 'hosp') renderHospitals(); else renderCare();
   spreadPins();
   const b = new maplibregl.LngLatBounds(); (mode === 'hosp' ? extra.hospitals : extra.care.flatMap(g => g.items)).forEach(x => x.p && b.extend(x.p));
-  map.fitBounds(b, { padding:{ top:Math.min(230, innerHeight*.27), bottom:$('panel').offsetHeight + 24, left:44, right:56 }, bearing:0, pitch:0, duration:1200 });
+  map.fitBounds(b, { padding:{ top:Math.min(230, innerHeight*.27), bottom:sheetH() + 24, left:sideW() + 44, right:56 }, bearing:0, pitch:0, duration:1200 });
 }
 
 const extraData = fetch('extra.json').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).catch(() => null);
@@ -403,7 +439,7 @@ map.on('load', async () => {
   shown = all;
   // 全縣視角：依診所分布範圍、標題與面板高度自動計算，南北兩端都露出來
   const county = new maplibregl.LngLatBounds(); all.forEach(c => county.extend(c.p));
-  const cam = map.cameraForBounds(county, { bearing:-20, padding:{ top:Math.min(200, innerHeight*.25), bottom:$('panel').offsetHeight + 12, left:50, right:60 } });
+  const cam = map.cameraForBounds(county, { bearing:-20, padding:{ top:Math.min(200, innerHeight*.25), bottom:sheetH() + 12, left:sideW() + 50, right:60 } });
   if (cam) Object.assign(HOME, { center:cam.center.toArray(), zoom:cam.zoom, pitch:30 });
   map.addSource('clinics', { type:'geojson', data:geo() });
   paintBase();
