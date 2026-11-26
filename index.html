@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>花蓮牙醫診所地圖｜依山傍海，找到照顧笑容的地方</title>
+<meta name="description" content="花蓮縣 74 家健保特約牙醫診所地圖，特別標示頂好牙醫診所；可依鄉鎮、名稱、路名與看診時段查詢。">
+<link rel="canonical" href="https://maskywg.github.io/hualien-dental-map/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="花蓮牙醫診所地圖｜依山傍海，找到照顧笑容的地方">
+<meta property="og:description" content="花蓮縣 74 家健保特約牙醫診所地圖，特別標示頂好牙醫診所；可依鄉鎮、名稱、路名與看診時段查詢。">
+<meta property="og:image" content="https://maskywg.github.io/hualien-dental-map/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://maskywg.github.io/hualien-dental-map/">
+<meta property="og:locale" content="zh_TW">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="花蓮牙醫診所地圖｜依山傍海，找到照顧笑容的地方">
+<meta name="twitter:description" content="花蓮縣 74 家健保特約牙醫診所地圖，特別標示頂好牙醫診所；可依鄉鎮、名稱、路名與看診時段查詢。">
+<meta name="twitter:image" content="https://maskywg.github.io/hualien-dental-map/og-image.jpg">
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css">
+<style>
+  :root { --ink:#17233b; --sub:#5b6880; --blue:#2563d9; --line:#d8dfec; --safe-b:env(safe-area-inset-bottom,0px); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  /* 字體比照 storemap.puma.taipei：介面用系統黑體，座標列用等寬字 */
+  html,body { height:100%; overflow:hidden; background:#f4f6fa; color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif; }
+  button,input,select { font-family:inherit; font-size:16px; color:var(--ink); }
+  #map { position:absolute; inset:0; }
+  .top { position:absolute; left:0; right:0; top:0; z-index:2; pointer-events:none; text-align:center; padding:calc(12px + env(safe-area-inset-top,0px)) 16px 34px;
+    background:linear-gradient(#f7f9fd 0%,rgba(247,249,253,.9) 62%,rgba(247,249,253,0) 100%); }
+  .kicker { font-size:12px; letter-spacing:.3em; color:var(--blue); }
+  h1 { font-size:clamp(19px,5.2vw,30px); font-weight:800; margin-top:4px; }
+  #count { font-size:13px; color:#a35f00; margin-top:3px; }
+  .hud { display:flex; justify-content:space-between; max-width:640px; margin:8px auto 0; padding:0 10px; border-left:2px solid #9db4e8; border-right:2px solid #9db4e8;
+    font:600 11px/1.6 ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace; color:var(--sub); text-align:left; }
+  .hud div:last-child { text-align:right; }
+  .panel { position:absolute; z-index:3; left:50%; transform:translateX(-50%); bottom:0; width:min(640px,100%); background:rgba(255,255,255,.96);
+    border:1px solid var(--line); border-bottom:0; border-radius:20px 20px 0 0; box-shadow:0 -8px 30px rgba(23,35,59,.14); padding:12px 14px calc(12px + var(--safe-b)); }
+  .row { display:flex; gap:8px; margin-top:8px; }
+  .row:first-child { margin-top:0; }
+  input,select,.btn { min-width:0; height:42px; border:1px solid var(--line); border-radius:10px; background:#fff; padding:0 10px; }
+  input { flex:1; }
+  .row select { flex:1; }
+  #district { flex:0 0 110px; }
+  .btn { cursor:pointer; white-space:nowrap; font-weight:700; }
+  .btn.on { background:var(--blue); border-color:var(--blue); color:#fff; }
+  #list { display:none; max-height:38vh; overflow:auto; margin-top:10px; border-top:1px solid var(--line); }
+  #list.on { display:block; }
+  .item { display:block; width:100%; text-align:left; border:0; border-bottom:1px solid #e9edf5; background:none; padding:9px 2px; cursor:pointer; }
+  .item b { display:block; font-size:15px; }
+  .item span { display:block; font-size:12.5px; color:var(--sub); }
+  .note { font-size:11px; color:var(--sub); margin-top:8px; line-height:1.5; }
+  .dist { background:rgba(255,255,255,.92); border:1px solid #b9c8ea; border-radius:14px; padding:1px 7px; text-align:center; font-size:11px; line-height:1.5; white-space:nowrap; font-weight:700; cursor:pointer; box-shadow:0 3px 12px rgba(23,35,59,.14); }
+  .dist small { margin-left:4px; font-size:12px; color:var(--blue); }
+  .maplibregl-popup-content { border-radius:14px; padding:14px; box-shadow:0 12px 34px rgba(23,35,59,.22); font-family:inherit; max-height:46vh; overflow:auto; }
+  .pop h2 { font-size:16px; padding-right:14px; }
+  .pop p { font-size:13px; color:var(--sub); margin-top:5px; line-height:1.5; }
+  .pop a { color:var(--blue); }
+  .pop table { width:100%; border-collapse:collapse; margin-top:8px; font-size:12px; text-align:center; }
+  .pop td,.pop th { border:1px solid var(--line); padding:2px 3px; }
+  .pop td.y { background:#dbe8ff; color:var(--blue); }
+  .maplibregl-ctrl-top-right { top:128px; }
+  .maplibregl-ctrl-bottom-right,.maplibregl-ctrl-bottom-left { bottom:var(--sheet-h,190px); }
+  /* ---------- 主視覺 ---------- */
+  .aurora { position:absolute; inset:0; z-index:1; pointer-events:none; mix-blend-mode:multiply; opacity:.55;
+    background:radial-gradient(42% 34% at 8% 18%,#bdeeff 0%,transparent 70%),radial-gradient(40% 36% at 94% 30%,#e2d3ff 0%,transparent 70%),radial-gradient(46% 30% at 78% 92%,#ffd8ea 0%,transparent 70%);
+    animation:drift 14s ease-in-out infinite alternate; }
+  @keyframes drift { to { transform:translate3d(2%,-2%,0) scale(1.06); } }
+  .kicker { font-weight:700; }
+  h1 { font-size:clamp(23px,6.2vw,46px); letter-spacing:.02em; line-height:1.25; }
+  h1 span { display:inline-block; background:linear-gradient(100deg,#0b2a6f 0%,#2563d9 25%,#06a6c9 40%,#7a4ddb 58%,#d9468f 72%,#0b2a6f 100%); background-size:220% 100%;
+    -webkit-background-clip:text; background-clip:text; color:transparent; animation:shine 7s linear infinite; filter:drop-shadow(0 2px 8px rgba(255,255,255,.9)); }
+  @keyframes shine { to { background-position:-220% 0; } }
+  #count { display:inline-block; margin-top:6px; padding:3px 14px; border-radius:999px; background:rgba(255,255,255,.86); border:1px solid #cfdcff; color:#3a4a78; font-weight:700; box-shadow:0 4px 18px rgba(70,100,220,.18); }
+  #count em { font-style:normal; font-size:19px; font-variant-numeric:tabular-nums; color:#2563d9; padding:0 2px; }
+  .panel { background:rgba(255,255,255,.82); -webkit-backdrop-filter:blur(16px) saturate(1.6); backdrop-filter:blur(16px) saturate(1.6); box-shadow:0 -10px 40px rgba(70,90,200,.2); }
+  .panel::before { content:""; position:absolute; left:20px; right:20px; top:-1px; height:3px; border-radius:3px; background:linear-gradient(90deg,#22c3e6,#3d7bf0,#8b5cf6,#ec5fa0); }
+  .btn.on { background:linear-gradient(100deg,#2563d9,#7a4ddb); }
+  .dist { background:rgba(255,255,255,.8); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); box-shadow:0 4px 18px rgba(80,90,220,.28); }
+  .legend { display:flex; align-items:center; justify-content:center; gap:7px; margin-top:7px; font-size:11px; color:var(--sub); }
+  .legend i { width:90px; height:7px; border-radius:7px; background:linear-gradient(90deg,#7fe0ee,#4f8df5,#8b5cf6,#ec4899); }
+  .hud { background:rgba(255,255,255,.55); }
+  .legend.off { visibility:hidden; }
+  @media (prefers-reduced-motion:reduce) { .aurora,h1 span { animation:none; } }
+  #btnStar { flex:1.6; background:linear-gradient(100deg,#ffd45e,#ffab2e); border-color:#f0a020; color:#4a2a00; box-shadow:0 3px 14px rgba(255,170,30,.45); }
+  #btnCounty,#btnCity { flex:1; }
+  .starpin { border:0; background:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; z-index:2; font-family:inherit; }
+  .starpin span { background:linear-gradient(100deg,#ffe27a,#ffb02e); color:#422500; font-weight:800; font-size:14px; padding:6px 13px; border-radius:999px; border:2px solid #fff; white-space:nowrap; box-shadow:0 5px 20px rgba(220,130,0,.55); animation:bob 2.2s ease-in-out infinite; }
+  .starpin i { font-style:normal; margin-right:4px; }
+  .starpin u { display:block; width:14px; height:14px; margin-top:6px; border-radius:50%; background:#ff9f1c; border:2px solid #fff; animation:halo 1.8s ease-out infinite; }
+  @keyframes bob { 50% { transform:translateY(-4px); } }
+  @keyframes halo { 0% { box-shadow:0 0 0 0 rgba(255,159,28,.75); } 100% { box-shadow:0 0 0 22px rgba(255,159,28,0); } }
+  .pop .badge { display:inline-block; font-size:11px; font-weight:800; background:#ffe6a3; color:#6b4100; border-radius:999px; padding:2px 9px; margin-bottom:6px; }
+  @media (prefers-reduced-motion:reduce) { .starpin span,.starpin u { animation:none; } }
+  .maplibregl-popup { z-index:4; }
+  #err { display:none; position:absolute; top:40%; left:20px; right:20px; z-index:4; text-align:center; }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div class="aurora"></div>
+<div class="top">
+  <div class="kicker">// 花蓮・牙醫診所地圖 //</div>
+  <h1><span>依山傍海，</span><span>找到照顧笑容的地方</span></h1>
+  <div id="count" aria-live="polite">資料載入中…</div>
+  <div class="hud"><div><span id="hN"></span><br><span id="hE"></span></div><div><span id="hT"></span><br><span id="hZ"></span></div></div>
+</div>
+<div id="err">地圖載入失敗，請檢查網路後重新整理。</div>
+<div class="panel" id="panel">
+  <div class="row">
+    <button class="btn" id="btnStar">★ 頂好牙醫診所</button>
+    <button class="btn" id="btnCounty">全縣</button>
+    <button class="btn" id="btnCity">花蓮市區</button>
+  </div>
+  <div class="row">
+    <select id="district" aria-label="鄉鎮市"><option value="">全花蓮</option></select>
+    <input id="q" type="search" placeholder="搜尋診所名稱或路名" aria-label="搜尋診所名稱或路名">
+  </div>
+  <div class="row">
+    <select id="day" aria-label="看診星期"><option value="">星期不限</option></select>
+    <select id="slot" aria-label="看診時段"><option value="">時段不限</option><option value="0">上午</option><option value="1">下午</option><option value="2">晚上</option></select>
+    <button class="btn" id="btnList" aria-expanded="false">清單</button>
+    <button class="btn" id="btn3d">平面</button>
+  </div>
+  <div id="list"></div>
+  <div class="legend" id="legend">光柱越高，診所越密集<span>疏</span><i></i><span>密</span><button class="btn" id="btnReplay" style="height:26px;font-size:11px;border-radius:999px">✦ 重播</button></div>
+  <details class="note"><summary>僅含健保特約牙醫診所，多數位置為推估，就診前請電話確認（資料說明）</summary>個人製作，非政府或健保署官方網站。資料：衛福部健保署「健保特約醫事機構-診所」，整理日期 2026-11-27；不含自費診所、醫院與衛生所牙科。座標以地址比對內政部國土測繪中心「查詢工商設施」的門牌點位，道路參考 OpenStreetMap；多數診所以鄰近門牌推估，導航請以地址為準。本圖特別標示頂好牙醫診所，不代表醫療品質評比。看診時段為健保登錄資料。</details>
+</div>
+<script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const FONT = '-apple-system, BlinkMacSystemFont, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif';
+const DAYS = '一二三四五六日';
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let all = [], shown = [], markers = [], popup, tilted = true;
+if (!window.maplibregl) { $('err').style.display = 'block'; throw new Error('maplibre not loaded'); }
+const map = new maplibregl.Map({ container:'map', style:'https://tiles.openfreemap.org/styles/positron', center:[121.50,23.73], zoom:innerWidth > 900 ? 8.9 : 8.75,
+  pitch:52, bearing:-14, minZoom:7.5, maxZoom:18, localIdeographFontFamily:FONT, attributionControl:{compact:true} });
+map.addControl(new maplibregl.NavigationControl(), 'top-right');
+map.addControl(new maplibregl.GeolocateControl({ positionOptions:{enableHighAccuracy:true}, trackUserLocation:true }), 'top-right');
+new ResizeObserver(() => document.body.style.setProperty('--sheet-h', $('panel').offsetHeight + 'px')).observe($('panel'));
+
+function hud() {
+  const c = map.getCenter();
+  $('hN').textContent = `N ${c.lat.toFixed(4)}°`; $('hE').textContent = `E ${c.lng.toFixed(4)}°`;
+  $('hT').textContent = 'TPE ' + new Date().toLocaleTimeString('en-GB', { timeZone:'Asia/Taipei' });
+  $('hZ').textContent = `Z ${map.getZoom().toFixed(1)}  TILT ${Math.round(map.getPitch())}°`;
+}
+map.on('move', hud); setInterval(hud, 1000); hud();
+
+const geo = () => ({ type:'FeatureCollection', features:shown.filter(c => c.p).map(c => ({ type:'Feature', geometry:{type:'Point',coordinates:c.p}, properties:{i:c.i, n:c.n, r:c.r} })) });
+
+const STAR = '頂好牙醫診所';
+const CALM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const HOME = { center:[121.50,23.73], zoom:innerWidth > 900 ? 8.9 : 8.75, pitch:48, bearing:-20 };
+
+/* 六角網格：把診所依位置分格，每格一根光柱 */
+const HEX = 1200, KX = 111320 * Math.cos(23.9 * Math.PI / 180), KY = 110940;   // 半徑（公尺）與每度長度
+function hexes() {
+  const g = new Map();
+  shown.filter(c => c.p).forEach(c => {
+    const x = c.p[0] * KX, y = c.p[1] * KY;
+    const q = (Math.sqrt(3)/3 * x - y/3) / HEX, r = (2/3 * y) / HEX;
+    let a = Math.round(q), b = Math.round(r), z = Math.round(-q-r);
+    const da = Math.abs(a-q), db = Math.abs(b-r), dz = Math.abs(z+q+r);
+    if (da > db && da > dz) a = -b-z; else if (db > dz) b = -a-z;
+    const k = a + ',' + b; if (!g.has(k)) g.set(k, { a, b, n:0 }); g.get(k).n++;
+  });
+  return { type:'FeatureCollection', features:[...g.values()].map(({a,b,n}) => {
+    const cx = HEX * Math.sqrt(3) * (a + b/2), cy = HEX * 1.5 * b;
+    const ring = [0,1,2,3,4,5,0].map(i => { const t = Math.PI/180 * (60*i - 30); return [(cx + HEX*.62*Math.cos(t))/KX, (cy + HEX*.62*Math.sin(t))/KY]; });
+    return { type:'Feature', geometry:{type:'Polygon',coordinates:[ring]}, properties:{ n } };
+  }) };
+}
+// 柱高隨縮放降低，拉近時才不會變成一道牆
+const pillarHeight = k => ['interpolate',['linear'],['zoom'], 8, ['*', ['get','n'], 800 * k], 11, ['*', ['get','n'], 130 * k]];
+
+function paintBase() {   // 淺色底圖上一點色彩：水面藍、綠地薄荷
+  const set = (id, prop, v) => { if (map.getLayer(id)) map.setPaintProperty(id, prop, v); };
+  set('background','background-color','#f5f6fc'); set('water','fill-color','#c4e4f8');
+  set('park','fill-color','#d5f0e2'); set('landcover_wood','fill-color','#d8efe0');
+}
+
+/* 開場：鏡頭飛入、診所由市中心向外亮起、光柱長高，之後緩慢環繞到使用者操作為止 */
+let raf = 0, orbiting = false;
+function stopShow() {
+  if (!orbiting && !raf) return;
+  const wasRunning = !!raf;
+  orbiting = false; cancelAnimationFrame(raf); raf = 0;
+  if (wasRunning) {
+    map.stop(); ['glow','dot','spark'].forEach(id => map.setFilter(id, id === 'spark' ? SPARK : null));
+    map.setPaintProperty('pillar','fill-extrusion-height', pillarHeight(1)); countUp(1);
+    // 開場飛到一半被打斷時，放開手後補回立體視角，光柱才看得出高低
+    setTimeout(() => { if (tilted && !map.isMoving() && map.getPitch() < HOME.pitch - 5) map.easeTo({ pitch:HOME.pitch, zoom:Math.max(map.getZoom(), HOME.zoom), duration:900 }); }, 700);
+  }
+}
+function countUp(k) { if (shown.length === all.length) $('count').innerHTML = `花蓮縣共 <em>${Math.round(all.length*k).toLocaleString()}</em> 家健保特約牙醫診所`; }
+function playShow() {
+  stopShow();
+  if (CALM) { map.jumpTo(HOME); map.setPaintProperty('pillar','fill-extrusion-height', pillarHeight(1)); countUp(1); return; }
+  popup?.remove();
+  map.jumpTo({ center:HOME.center, zoom:HOME.zoom - .8, pitch:20, bearing:20 });
+  map.flyTo({ ...HOME, duration:4200, curve:1.2, padding:{top:0,bottom:0,left:0,right:0}, essential:false });
+  const t0 = performance.now(); let last = 0;
+  const frame = now => {
+    const t = now - t0;
+    if (now - last > 40) {
+      last = now;
+      const wave = Math.min(1, t / 3200), grow = Math.min(1, Math.max(0, (t - 1500) / 2600));
+      const f = ['<=', ['get','r'], wave * 95000 + 1];
+      map.setFilter('dot', f); map.setFilter('glow', f); map.setFilter('spark', ['all', SPARK, f]);
+      map.setPaintProperty('pillar','fill-extrusion-height', pillarHeight(1 - Math.pow(1 - grow, 3)));
+      countUp(1 - Math.pow(1 - wave, 3));
+    }
+    if (t < 4400) { raf = requestAnimationFrame(frame); return; }
+    raf = 0; ['glow','dot'].forEach(id => map.setFilter(id, null)); map.setFilter('spark', SPARK); countUp(1);
+    orbiting = true; let prev = now;
+    const spin = n => {
+      if (!orbiting) return;
+      if (!map.isMoving() || map.isRotating()) map.setBearing(map.getBearing() + (n - prev) * .0018);
+      prev = n; requestAnimationFrame(spin);
+    };
+    requestAnimationFrame(spin);
+  };
+  raf = requestAnimationFrame(frame);
+}
+const SPARK = ['==', ['%', ['get','i'], 9], 0];
+function pulse() {   // 部分診所向外擴散的光圈
+  if (CALM || !map.getLayer('spark')) return;
+  const k = (performance.now() % 2200) / 2200, z = map.getZoom();
+  map.setPaintProperty('spark','circle-radius', 4 + k * (z > 14 ? 34 : 16));
+  map.setPaintProperty('spark','circle-stroke-opacity', .75 * (1 - k));
+}
+
+function openClinic(c) {
+  popup?.remove();
+  const table = c.h ? '<table><tr><th></th>' + [...DAYS].map(d => `<th>${d}</th>`).join('') + '</tr>' +
+    ['上午','下午','晚上'].map((t,s) => `<tr><th>${t}</th>` + [...DAYS].map((_,d) => c.h[s*7+d] === '1' ? '<td class="y">●</td>' : '<td></td>').join('') + '</tr>').join('') + '</table>' : '<p>未登錄看診時段</p>';
+  const tel = c.t.replace(/[^\d+#]/g, '');
+  popup = new maplibregl.Popup({ maxWidth:'300px', offset:10 }).setLngLat(c.p).setHTML(
+    `<div class="pop${c.n === STAR ? ' star' : ''}">` + (c.n === STAR ? '<div class="badge">★ 本圖特別標示</div>' : '') + `<h2>${esc(c.n)}</h2><p>${esc(c.a)}</p>` + (c.t ? `<p>電話 <a href="tel:${tel}">${esc(c.t)}</a></p>` : '') +
+    table + (c.m ? `<p>備註：${esc(c.m)}</p>` : '') + (c.x === 1 ? '<p>※ 位置依鄰近門牌推估，請以地址為準。</p>' : c.x === 2 ? '<p>※ 僅能確認在這條道路一帶，請務必依地址導航。</p>' : '') +
+    `<p><a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.n + ' ' + c.a)}">用 Google 地圖導航 ↗</a></p></div>`).addTo(map);
+}
+function go(c) {
+  $('list').classList.remove('on'); $('btnList').setAttribute('aria-expanded', 'false'); $('btnList').classList.remove('on');
+  map.flyTo({ center:c.p, zoom:16.5, offset:[0, Math.min(90, innerHeight/2 - $('panel').offsetHeight - 36)] }); openClinic(c);
+}
+
+function fit(list) {
+  const pts = list.filter(c => c.p); if (!pts.length) return;
+  const b = new maplibregl.LngLatBounds(); pts.forEach(c => b.extend(c.p));
+  map.fitBounds(b, { padding:{ top:140, bottom:$('panel').offsetHeight + 20, left:30, right:50 }, maxZoom:15.5, pitch:tilted?52:0, bearing:tilted?-14:0 });
+}
+function districtLabels() {
+  markers.forEach(m => m.remove()); markers = [];
+  if (map.getZoom() >= 11.8) return;
+  const g = {}; shown.filter(c => c.p).forEach(c => (g[c.d] ||= []).push(c));
+  for (const [d, list] of Object.entries(g)) {
+    const el = document.createElement('button'); el.className = 'dist'; el.innerHTML = `${d}<small>${list.length}</small>`;
+    el.onclick = () => { $('district').value = d; apply(true); };
+    const mid = k => list.map(c => c.p[k]).sort((a,b) => a-b)[list.length >> 1];
+    markers.push(new maplibregl.Marker({ element:el, offset:({ '花蓮市':[66,24], '吉安鄉':[-70,6], '壽豐鄉':[44,26], '新城鄉':[112,-14], '秀林鄉':[-108,-34] })[d] || [0,0] }).setLngLat([mid(0), mid(1)]).addTo(map));
+  }
+}
+function renderList() {
+  const box = $('list'); if (!box.classList.contains('on')) return;
+  box.innerHTML = shown.length ? '' : '<p class="note">沒有符合的診所，請放寬條件。</p>';
+  [...shown].sort((a,b) => (b.n === STAR) - (a.n === STAR)).forEach(c => {
+    const b = document.createElement('button'); b.className = 'item'; b.innerHTML = `<b>${c.n === STAR ? '★ ' : ''}${esc(c.n)}</b><span>${esc(c.a)}</span>`;
+    b.onclick = () => go(c); box.appendChild(b);
+  });
+}
+function apply(move) {
+  const norm = s => s.normalize('NFKC').replace(/臺/g,'台').replace(/\s/g,'')
+    .replace(/(\d)段/g, (_,n) => '零一二三四五六七八九'[n] + '段');
+  const q = norm($('q').value), d = $('district').value, day = $('day').value, slot = $('slot').value;
+  shown = all.filter(c => (!d || c.d === d) && (!q || c.key.includes(q)) &&
+    ((day === '' && slot === '') || [0,1,2].some(s => (slot === '' || +slot === s) && [...DAYS].some((_,k) => (day === '' || +day === k) && c.h[s*7+k] === '1'))));
+  popup?.remove();
+  map.getSource('clinics')?.setData(geo());
+  map.getSource('hex')?.setData(hexes());
+  if (shown.length === all.length) countUp(1); else $('count').innerHTML = `符合條件 <em>${shown.length.toLocaleString()}</em> 家`;
+  renderList(); districtLabels(); if (move) { if (shown.length === all.length) map.easeTo({ ...HOME, pitch:tilted ? HOME.pitch : 0, bearing:tilted ? HOME.bearing : 0, duration:900 }); else fit(shown); }
+}
+
+const data = fetch('clinics.json').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
+map.on('load', async () => {
+  try { all = (await data).clinics; } catch (e) { $('count').textContent = '診所資料載入失敗，請重新整理'; return; }
+  all.forEach((c,i) => { c.i = i; c.r = c.p ? Math.hypot((c.p[0]-121.605)*KX, (c.p[1]-23.98)*KY) : 0; c.key = (c.n + c.a).normalize('NFKC').replace(/臺/g,'台').replace(/(\d)段/g, (_,n) => '零一二三四五六七八九'[n] + '段'); });
+  [...new Set(all.map(c => c.d))].forEach(d => $('district').add(new Option(d, d)));
+  [...DAYS].forEach((d,i) => $('day').add(new Option('星期' + d, i)));
+  shown = all;
+  // 全縣視角：依診所分布範圍、標題與面板高度自動計算，南北兩端都露出來
+  const county = new maplibregl.LngLatBounds(); all.forEach(c => county.extend(c.p));
+  const cam = map.cameraForBounds(county, { bearing:-20, padding:{ top:Math.min(200, innerHeight*.25), bottom:$('panel').offsetHeight + 12, left:50, right:60 } });
+  if (cam) Object.assign(HOME, { center:cam.center.toArray(), zoom:cam.zoom, pitch:30 });
+  map.addSource('clinics', { type:'geojson', data:geo() });
+  paintBase();
+  map.addSource('hex', { type:'geojson', data:hexes() });
+  map.addLayer({ id:'pillar', type:'fill-extrusion', source:'hex', maxzoom:11.9, paint:{
+    'fill-extrusion-color':['interpolate',['linear'],['get','n'], 1,'#7fe0ee', 4,'#4f8df5', 9,'#8b5cf6', 16,'#ec4899'],
+    'fill-extrusion-height':pillarHeight(0), 'fill-extrusion-vertical-gradient':true,
+    'fill-extrusion-opacity':['interpolate',['linear'],['zoom'], 10.8,.82, 11.8,0] } });
+  map.addLayer({ id:'glow', type:'circle', source:'clinics', paint:{ 'circle-radius':['interpolate',['linear'],['zoom'],10,5,16,18], 'circle-color':'#3d7bf0', 'circle-opacity':['interpolate',['linear'],['zoom'],11.4,.07,13.2,.22], 'circle-blur':.8 } });
+  map.addLayer({ id:'dot', type:'circle', source:'clinics', paint:{ 'circle-radius':['interpolate',['linear'],['zoom'],10,2.4,16,8], 'circle-color':'#2563d9', 'circle-stroke-color':'#fff',
+    'circle-opacity':['interpolate',['linear'],['zoom'],11.4,.35,13.2,1], 'circle-stroke-opacity':['interpolate',['linear'],['zoom'],11.4,.35,13.2,1], 'circle-stroke-width':['interpolate',['linear'],['zoom'],10,.8,16,2.5] } });
+  map.addLayer({ id:'spark', type:'circle', source:'clinics', filter:SPARK, paint:{ 'circle-color':'rgba(0,0,0,0)', 'circle-radius':6, 'circle-stroke-color':'#7a4ddb', 'circle-stroke-width':1.6, 'circle-stroke-opacity':0 } }, 'dot');
+  setInterval(pulse, 60);
+  const star = all.find(c => c.n === STAR);
+  if (star) {
+    const [x, y] = star.p, R = 520;
+    const ring = Array.from({length:11}, (_,i) => { const t = Math.PI/5 * i - Math.PI/2, k = i % 2 ? R*.45 : R; return [x + k*Math.cos(t)/KX, y - k*Math.sin(t)/KY]; });
+    map.addSource('beacon', { type:'geojson', data:{ type:'Feature', properties:{}, geometry:{ type:'Polygon', coordinates:[ring] } } });
+    map.addLayer({ id:'beacon', type:'fill-extrusion', source:'beacon', maxzoom:11.9, paint:{ 'fill-extrusion-color':'#ffb703', 'fill-extrusion-height':['interpolate',['linear'],['zoom'], 8, 22000, 11, 4200], 'fill-extrusion-opacity':.9 } });
+    const el = document.createElement('button'); el.className = 'starpin'; el.innerHTML = '<span><i>★</i>' + STAR + '</span><u></u>'; el.setAttribute('aria-label', STAR);
+    el.onclick = e => { e.stopPropagation(); stopShow(); go(star); };
+    new maplibregl.Marker({ element:el, anchor:'bottom', offset:[0,7] }).setLngLat(star.p).addTo(map);
+    $('btnStar').onclick = () => go(star);
+  }
+  const view = v => { popup?.remove(); map.flyTo({ ...v, duration:1600 }); };
+  $('btnCounty').onclick = () => view(HOME);
+  $('btnCity').onclick = () => view({ center:[121.600,23.980], zoom:12.6, pitch:tilted?55:0, bearing:tilted?-16:0 });
+  /* 拉近後出現立體建築 */
+  if (map.getSource('openmaptiles')) map.addLayer({ id:'bld3d', type:'fill-extrusion', source:'openmaptiles', 'source-layer':'building', minzoom:14, paint:{
+    'fill-extrusion-color':'#d9ddf3', 'fill-extrusion-height':['coalesce',['get','render_height'],8], 'fill-extrusion-base':['coalesce',['get','render_min_height'],0], 'fill-extrusion-opacity':.65 } }, 'glow');
+  map.addLayer({ id:'name', type:'symbol', source:'clinics', minzoom:14.5, layout:{ 'text-field':['get','n'], 'text-font':['Noto Sans Bold'], 'text-size':13, 'text-offset':[0,.9], 'text-anchor':'top' },
+    paint:{ 'text-color':'#17233b', 'text-halo-color':'#fff', 'text-halo-width':2 } });
+  map.on('click', e => {
+    const r = 10, f = map.queryRenderedFeatures([[e.point.x-r,e.point.y-r],[e.point.x+r,e.point.y+r]], { layers:['dot','name'] });
+    if (!f.length) {
+      const h = map.getZoom() < 11.8 && map.queryRenderedFeatures(e.point, { layers:['pillar'] });
+      if (h && h.length) map.easeTo({ center:e.lngLat, zoom:14.6, duration:1200 });
+      return;
+    }
+    if (map.getZoom() < 13.5) map.easeTo({ center:f[0].geometry.coordinates, zoom:15 }); else openClinic(all[f[0].properties.i]);
+  });
+  map.on('mouseenter','dot', () => map.getCanvas().style.cursor = 'pointer');
+  map.on('mouseleave','dot', () => map.getCanvas().style.cursor = '');
+  map.on('zoomend', () => { districtLabels(); $('legend').classList.toggle('off', map.getZoom() >= 11.8); });
+  ['mousedown','touchstart','wheel'].forEach(ev => map.getCanvasContainer().addEventListener(ev, stopShow, { passive:true }));
+  ['pointerdown','keydown','change','input'].forEach(ev => $('panel').addEventListener(ev, e => { if (e.target.id !== 'btnReplay') stopShow(); }, true));
+  document.querySelector('.maplibregl-control-container').addEventListener('pointerdown', stopShow, true);
+  document.addEventListener('pointerdown', e => { if (e.target.closest('.dist')) stopShow(); }, true);
+  $('btnReplay').onclick = () => {
+    $('district').value = $('day').value = $('slot').value = $('q').value = '';
+    $('list').classList.remove('on'); $('btnList').classList.remove('on'); apply(false); playShow();
+  };
+  document.querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show');
+  $('district').onchange = $('day').onchange = $('slot').onchange = () => apply(true);
+  $('q').oninput = () => apply(false);
+  $('q').onkeydown = e => { if (e.key === 'Enter') { apply(true); e.target.blur(); } };
+  $('btnList').onclick = () => { const on = $('list').classList.toggle('on'); $('btnList').classList.toggle('on', on); $('btnList').setAttribute('aria-expanded', on); renderList(); };
+  $('btn3d').onclick = () => { tilted = !tilted; $('btn3d').textContent = tilted ? '平面' : '立體'; map.easeTo({ pitch:tilted?52:0, bearing:tilted?-14:0 }); };
+  apply(false);
+  playShow();
+});
+</script>
+</body>
+</html>
