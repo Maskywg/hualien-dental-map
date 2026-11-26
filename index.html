@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>花蓮牙醫診所地圖｜依山傍海，找到照顧笑容的地方</title>
-<meta name="description" content="花蓮縣 74 家健保特約牙醫診所地圖，特別標示頂好牙醫診所；可依鄉鎮、名稱、路名與看診時段查詢。">
+<meta name="description" content="花蓮縣 74 家健保特約牙醫診所地圖，特別標示頂好牙醫診所；可依鄉鎮、名稱、路名與看診時段查詢，另整理醫院牙科與巡迴、機構口腔照護資訊。">
 <link rel="canonical" href="https://maskywg.github.io/hualien-dental-map/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="花蓮牙醫診所地圖｜依山傍海，找到照顧笑容的地方">
-<meta property="og:description" content="花蓮縣 74 家健保特約牙醫診所地圖，特別標示頂好牙醫診所；可依鄉鎮、名稱、路名與看診時段查詢。">
+<meta property="og:description" content="花蓮縣 74 家健保特約牙醫診所地圖，特別標示頂好牙醫診所；可依鄉鎮、名稱、路名與看診時段查詢，另整理醫院牙科與巡迴、機構口腔照護資訊。">
 <meta property="og:image" content="https://maskywg.github.io/hualien-dental-map/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -16,7 +16,7 @@
 <meta property="og:locale" content="zh_TW">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="花蓮牙醫診所地圖｜依山傍海，找到照顧笑容的地方">
-<meta name="twitter:description" content="花蓮縣 74 家健保特約牙醫診所地圖，特別標示頂好牙醫診所；可依鄉鎮、名稱、路名與看診時段查詢。">
+<meta name="twitter:description" content="花蓮縣 74 家健保特約牙醫診所地圖，特別標示頂好牙醫診所；可依鄉鎮、名稱、路名與看診時段查詢，另整理醫院牙科與巡迴、機構口腔照護資訊。">
 <meta name="twitter:image" content="https://maskywg.github.io/hualien-dental-map/og-image.jpg">
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css">
 <style>
@@ -94,6 +94,34 @@
   .pop .badge { display:inline-block; font-size:11px; font-weight:800; background:#ffe6a3; color:#6b4100; border-radius:999px; padding:2px 9px; margin-bottom:6px; }
   @media (prefers-reduced-motion:reduce) { .starpin span,.starpin u { animation:none; } }
   .maplibregl-popup { z-index:4; }
+  .tabs { display:flex; gap:4px; padding:3px; border-radius:12px; background:#e9eefb; margin-bottom:8px; }
+  .tabs button { flex:1; border:0; border-radius:9px; background:none; height:34px; font-size:14px; font-weight:700; color:var(--sub); cursor:pointer; white-space:nowrap; }
+  /* 三類各用一色：診所藍、醫院藍綠、巡迴機構紫；分頁、清單編號與地圖標記一致 */
+  .tabs button[data-mode=clinic] { --cat:#2563d9; }
+  .tabs button[data-mode=hosp] { --cat:#0b7a7c; }
+  .tabs button[data-mode=care] { --cat:#7a4ddb; }
+  .tabs button::before { content:""; display:inline-block; width:9px; height:9px; margin-right:6px; border-radius:50%; background:var(--cat); }
+  .tabs button.on { background:var(--cat); color:#fff; box-shadow:0 3px 10px rgba(40,60,140,.28); }
+  .tabs button.on::before { background:#fff; }
+  .panel.care .num { background:#7a4ddb; }
+  #extra { display:none; max-height:34vh; overflow:auto; }
+  .panel.alt .clinic-only { display:none; }
+  .panel.alt #extra { display:block; }
+  #extra h3 { font-size:14px; margin-top:10px; }
+  #extra h3:first-child { margin-top:0; }
+  #extra .hint { font-size:12px; color:var(--sub); line-height:1.55; margin-top:2px; }
+  .card { border-bottom:1px solid #e4e9f4; padding:9px 2px; }
+  .card b { display:block; font-size:14.5px; }
+  .card p { font-size:12.5px; color:var(--sub); line-height:1.55; margin-top:3px; }
+  .card a, .card .locate { font-size:12.5px; color:var(--blue); }
+  .card .locate { border:0; background:none; padding:0; margin-right:12px; cursor:pointer; font-weight:700; }
+  .num { display:inline-block; min-width:20px; height:20px; margin-right:6px; border-radius:10px; background:#0f8b8d; color:#fff; font-size:12px; line-height:20px; text-align:center; }
+  .tag { display:inline-block; font-size:11px; font-weight:700; border-radius:999px; padding:1px 8px; margin-top:4px; }
+  .tag.ok { background:#d9f3e4; color:#136c43; }
+  .tag.wait { background:#fff0d6; color:#8a5200; }
+  .pin { width:28px; height:28px; padding:0; border-radius:50%; border:2px solid #fff; background:#0f8b8d; color:#fff; font:800 13px/24px ui-monospace,Menlo,monospace; cursor:pointer; box-shadow:0 3px 12px rgba(10,80,90,.4); }
+  .pin.wait { background:#fff; border-color:#0f8b8d; color:#0b6a6c; }
+  .pin.care { background:#7a4ddb; }
   #err { display:none; position:absolute; top:40%; left:20px; right:20px; z-index:4; text-align:center; }
 </style>
 </head>
@@ -108,24 +136,30 @@
 </div>
 <div id="err">地圖載入失敗，請檢查網路後重新整理。</div>
 <div class="panel" id="panel">
-  <div class="row">
+  <div class="tabs" role="tablist">
+    <button data-mode="clinic" class="on" aria-selected="true">牙醫診所</button>
+    <button data-mode="hosp" aria-selected="false">醫院牙科</button>
+    <button data-mode="care" aria-selected="false">巡迴・機構</button>
+  </div>
+  <div id="extra"></div>
+  <div class="row clinic-only">
     <button class="btn" id="btnStar">★ 頂好牙醫診所</button>
     <button class="btn" id="btnCounty">全縣</button>
     <button class="btn" id="btnCity">花蓮市區</button>
   </div>
-  <div class="row">
+  <div class="row clinic-only">
     <select id="district" aria-label="鄉鎮市"><option value="">全花蓮</option></select>
     <input id="q" type="search" placeholder="搜尋診所名稱或路名" aria-label="搜尋診所名稱或路名">
   </div>
-  <div class="row">
+  <div class="row clinic-only">
     <select id="day" aria-label="看診星期"><option value="">星期不限</option></select>
     <select id="slot" aria-label="看診時段"><option value="">時段不限</option><option value="0">上午</option><option value="1">下午</option><option value="2">晚上</option></select>
     <button class="btn" id="btnList" aria-expanded="false">清單</button>
     <button class="btn" id="btn3d">平面</button>
   </div>
-  <div id="list"></div>
-  <div class="legend" id="legend">光柱越高，診所越密集<span>疏</span><i></i><span>密</span><button class="btn" id="btnReplay" style="height:26px;font-size:11px;border-radius:999px">✦ 重播</button></div>
-  <details class="note"><summary>僅含健保特約牙醫診所，多數位置為推估，就診前請電話確認（資料說明）</summary>個人製作，非政府或健保署官方網站。資料：衛福部健保署「健保特約醫事機構-診所」，整理日期 2026-11-27；不含自費診所、醫院與衛生所牙科。座標以地址比對內政部國土測繪中心「查詢工商設施」的門牌點位，道路參考 OpenStreetMap；多數診所以鄰近門牌推估，導航請以地址為準。本圖特別標示頂好牙醫診所，不代表醫療品質評比。看診時段為健保登錄資料。</details>
+  <div id="list" class="clinic-only"></div>
+  <div class="legend clinic-only" id="legend">光柱越高，診所越密集<span>疏</span><i></i><span>密</span><button class="btn" id="btnReplay" style="height:26px;font-size:11px;border-radius:999px">✦ 重播</button></div>
+  <details class="note"><summary>多數位置為推估，就診前請電話確認（資料說明）</summary>個人製作，非政府或健保署官方網站。診所資料：衛福部健保署「健保特約醫事機構-診所」，整理日期 2026-11-27；診所數不含自費診所、醫院與衛生所。醫院與巡迴・機構分頁為另外整理的資料，查證程度標示於各項目，醫院與衛生所座標取自 OpenStreetMap 或以鄰近門牌推估。座標以地址比對內政部國土測繪中心「查詢工商設施」的門牌點位，道路參考 OpenStreetMap；多數診所以鄰近門牌推估，導航請以地址為準。本圖特別標示頂好牙醫診所，不代表醫療品質評比。看診時段為健保登錄資料。</details>
 </div>
 <script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>
 <script>
@@ -255,7 +289,7 @@ function fit(list) {
 }
 function districtLabels() {
   markers.forEach(m => m.remove()); markers = [];
-  if (map.getZoom() >= 11.8) return;
+  if (mode !== 'clinic' || map.getZoom() >= 11.8) return;
   const g = {}; shown.filter(c => c.p).forEach(c => (g[c.d] ||= []).push(c));
   for (const [d, list] of Object.entries(g)) {
     const el = document.createElement('button'); el.className = 'dist'; el.innerHTML = `${d}<small>${list.length}</small>`;
@@ -285,6 +319,81 @@ function apply(move) {
   renderList(); districtLabels(); if (move) { if (shown.length === all.length) map.easeTo({ ...HOME, pitch:tilted ? HOME.pitch : 0, bearing:tilted ? HOME.bearing : 0, duration:900 }); else fit(shown); }
 }
 
+/* 醫院牙科、巡迴與機構照護分頁 */
+let mode = 'clinic', extra = null, pins = [], starMarker = null;
+const mapLink = (n, a) => `<a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(n + ' ' + a)}">Google 地圖 ↗</a>`;
+const telLink = t => `<a href="tel:${t.replace(/[^\d]/g, '')}">${esc(t)}</a>`;
+function showSpot(x, html) {
+  popup?.remove();
+  map.flyTo({ center:x.p, zoom:15.5, offset:[0, Math.min(60, innerHeight/2 - $('panel').offsetHeight - 40)], duration:1400 });
+  popup = new maplibregl.Popup({ maxWidth:'280px', offset:16 }).setLngLat(x.p).setHTML(`<div class="pop">${html}</div>`).addTo(map);
+}
+function addPin(x, label, cls, html) {
+  const el = document.createElement('button'); el.className = 'pin ' + cls; el.textContent = label; el.setAttribute('aria-label', x.n);
+  el.onclick = e => { e.stopPropagation(); showSpot(x, html); };
+  pins.push(new maplibregl.Marker({ element:el }).setLngLat(x.p).addTo(map));
+}
+// 遠景時花蓮市與玉里的編號會疊在一起，暫時錯開；拉近後回到實際位置
+const SPREAD = { '1':[-34,-24], '2':[-40,10], '3':[36,-18], '4':[34,16], '8':[-34,4], '9':[-8,-30], '10':[28,4] };
+function spreadPins() {
+  const far = map.getZoom() < 10.5;
+  pins.forEach(m => m.setOffset((far && SPREAD[m.getElement().textContent]) || [0,0]));
+}
+function card(title, body, x, html, links) {
+  const d = document.createElement('div'); d.className = 'card'; d.innerHTML = `<b>${title}</b>${body}<p></p>`;
+  const row = d.lastElementChild; row.innerHTML = links;
+  if (x.p) { const b = document.createElement('button'); b.className = 'locate'; b.textContent = '在地圖上看'; b.onclick = () => showSpot(x, html); row.prepend(b); }
+  $('extra').appendChild(d);
+}
+function heading(title, hint) { $('extra').insertAdjacentHTML('beforeend', `<h3>${title}</h3><p class="hint">${hint}</p>`); }
+function renderHospitals() {
+  const list = extra.hospitals, n = list.filter(h => h.ok).length;
+  $('count').innerHTML = `醫院牙科整理 <em>${list.length}</em> 家（含分院）`;
+  heading('由北至南', `綠色標籤（${n} 家）：醫院官網或門診表可見牙科。橘色標籤（${list.length - n} 家）：列於<a target="_blank" rel="noopener" href="${extra.source}">花蓮縣衛生局幼兒塗氟院所名單（2026 年 2 月）</a>，一般牙科門診時段尚未查到。偏鄉分院多為固定時段開診，就診前請先致電。`);
+  list.forEach((h, i) => {
+    const tag = h.ok ? '<span class="tag ok">官網／門診表可見牙科</span>' : '<span class="tag wait">衛生局塗氟名單列名</span>';
+    const info = `<p>${esc(h.a)}</p>` + (h.note ? `<p>${esc(h.note)}</p>` : '');
+    const html = `<h2>${esc(h.n)}</h2>${tag}${info}<p>電話 ${telLink(h.t)}</p><p>${mapLink(h.n, h.a)}</p>`;
+    card(`<span class="num">${i + 1}</span>${esc(h.n)}`, `${tag}${info}<p>電話 ${telLink(h.t)}</p>`, h, html, mapLink(h.n, h.a));
+    addPin(h, i + 1, h.ok ? '' : 'wait', html);
+  });
+}
+function renderCare() {
+  $('count').innerHTML = '巡迴牙醫與機構口腔照護';
+  heading('主要推動單位', '花蓮縣衛生局、花蓮縣牙醫師公會。時段、設備與服務對象會隨計畫調整，請向上述單位或各衛生所、機構洽詢。地圖只標出可定位的衛生所。');
+  let k = 0;
+  extra.care.forEach(group => {
+    heading(group.title, group.hint);
+    group.items.forEach(x => {
+      const label = x.p ? String.fromCharCode(65 + k++) : '';
+      const src = x.src ? `<span class="tag ok">佐證：${esc(x.src)}</span>` : '<span class="tag wait">依提供資料整理，尚未查到公開佐證</span>';
+      const info = `<p>${esc(x.desc)}</p>` + (x.t ? `<p>電話 ${telLink(x.t)}</p>` : '') + (x.a ? `<p>${esc(x.a)}${x.est ? '（地圖位置依鄰近門牌推估）' : ''}</p>` : '');
+      const html = `<h2>${esc(x.n)}</h2>${src}${info}` + (x.a ? `<p>${mapLink(x.n, x.a)}</p>` : '');
+      card((label ? `<span class="num">${label}</span>` : '') + esc(x.n), src + info, x, html, x.a ? mapLink(x.n, x.a) : '');
+      if (x.p) addPin(x, label, 'care', html);
+    });
+  });
+}
+function setMode(next) {
+  if (next === mode) return;
+  if (next !== 'clinic' && !extra) { $('count').textContent = '補充資料載入失敗，請重新整理'; return; }
+  mode = next; popup?.remove();
+  document.querySelectorAll('.tabs button').forEach(b => { const on = b.dataset.mode === mode; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
+  pins.forEach(m => m.remove()); pins = []; $('extra').innerHTML = ''; $('extra').scrollTop = 0;
+  const clinic = mode === 'clinic';
+  $('panel').classList.toggle('alt', !clinic);
+  $('panel').classList.toggle('care', mode === 'care');
+  ['pillar','beacon','glow','dot','spark','name'].forEach(id => { if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', clinic ? 'visible' : 'none'); });
+  if (starMarker) starMarker.getElement().style.display = clinic ? '' : 'none';
+  districtLabels();
+  if (clinic) { apply(true); return; }
+  if (mode === 'hosp') renderHospitals(); else renderCare();
+  spreadPins();
+  const b = new maplibregl.LngLatBounds(); (mode === 'hosp' ? extra.hospitals : extra.care.flatMap(g => g.items)).forEach(x => x.p && b.extend(x.p));
+  map.fitBounds(b, { padding:{ top:Math.min(230, innerHeight*.27), bottom:$('panel').offsetHeight + 24, left:44, right:56 }, bearing:0, pitch:0, duration:1200 });
+}
+
+const extraData = fetch('extra.json').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).catch(() => null);
 const data = fetch('clinics.json').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
 map.on('load', async () => {
   try { all = (await data).clinics; } catch (e) { $('count').textContent = '診所資料載入失敗，請重新整理'; return; }
@@ -316,7 +425,7 @@ map.on('load', async () => {
     map.addLayer({ id:'beacon', type:'fill-extrusion', source:'beacon', maxzoom:11.9, paint:{ 'fill-extrusion-color':'#ffb703', 'fill-extrusion-height':['interpolate',['linear'],['zoom'], 8, 22000, 11, 4200], 'fill-extrusion-opacity':.9 } });
     const el = document.createElement('button'); el.className = 'starpin'; el.innerHTML = '<span><i>★</i>' + STAR + '</span><u></u>'; el.setAttribute('aria-label', STAR);
     el.onclick = e => { e.stopPropagation(); stopShow(); go(star); };
-    new maplibregl.Marker({ element:el, anchor:'bottom', offset:[0,7] }).setLngLat(star.p).addTo(map);
+    starMarker = new maplibregl.Marker({ element:el, anchor:'bottom', offset:[0,7] }).setLngLat(star.p).addTo(map);
     $('btnStar').onclick = () => go(star);
   }
   const view = v => { popup?.remove(); map.flyTo({ ...v, duration:1600 }); };
@@ -338,7 +447,7 @@ map.on('load', async () => {
   });
   map.on('mouseenter','dot', () => map.getCanvas().style.cursor = 'pointer');
   map.on('mouseleave','dot', () => map.getCanvas().style.cursor = '');
-  map.on('zoomend', () => { districtLabels(); $('legend').classList.toggle('off', map.getZoom() >= 11.8); });
+  map.on('zoomend', () => { spreadPins(); districtLabels(); $('legend').classList.toggle('off', map.getZoom() >= 11.8); });
   ['mousedown','touchstart','wheel'].forEach(ev => map.getCanvasContainer().addEventListener(ev, stopShow, { passive:true }));
   ['pointerdown','keydown','change','input'].forEach(ev => $('panel').addEventListener(ev, e => { if (e.target.id !== 'btnReplay') stopShow(); }, true));
   document.querySelector('.maplibregl-control-container').addEventListener('pointerdown', stopShow, true);
@@ -355,6 +464,8 @@ map.on('load', async () => {
   $('btn3d').onclick = () => { tilted = !tilted; $('btn3d').textContent = tilted ? '平面' : '立體'; map.easeTo({ pitch:tilted?52:0, bearing:tilted?-14:0 }); };
   apply(false);
   playShow();
+  extra = await extraData;
+  document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => { stopShow(); setMode(b.dataset.mode); });
 });
 </script>
 </body>
