@@ -153,6 +153,7 @@
     .hud { display:none; }
     .maplibregl-ctrl-top-right { top:12px; }
   }
+  #extra .tilt { float:right; margin-left:8px; height:28px !important; font-size:12px; border-radius:999px; }
   #err { display:none; position:absolute; top:40%; left:20px; right:20px; z-index:4; text-align:center; }
 </style>
 </head>
@@ -355,13 +356,24 @@ function apply(move) {
   renderList(); districtLabels(); if (move) { if (shown.length === all.length) map.easeTo({ ...HOME, pitch:tilted ? HOME.pitch : 0, bearing:tilted ? HOME.bearing : 0, duration:900 }); else fit(shown); }
 }
 
+/* 立體／平面：三個分頁共用 */
+const view3d = (pitch, bearing) => ({ pitch:tilted ? pitch : 0, bearing:tilted ? bearing : 0 });
+function toggleTilt() {
+  tilted = !tilted;
+  document.querySelectorAll('#btn3d, #extra .tilt').forEach(b => b.textContent = tilted ? '平面' : '立體');
+  map.easeTo(view3d(52, -14));
+}
+function addTiltButton() {
+  const b = document.createElement('button'); b.className = 'btn tilt'; b.textContent = tilted ? '平面' : '立體'; b.onclick = toggleTilt;
+  $('extra').prepend(b);
+}
 /* 醫院牙科、巡迴與機構照護分頁 */
 let mode = 'clinic', extra = null, pins = [], starMarker = null;
 const mapLink = (n, a) => `<a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(n + ' ' + a)}">Google 地圖 ↗</a>`;
 const telLink = t => `<a href="tel:${t.replace(/[^\d]/g, '')}">${esc(t)}</a>`;
 function showSpot(x, html) {
   popup?.remove();
-  map.flyTo({ center:x.p, zoom:15.5, offset:focusOffset(60, 40), duration:1400 });
+  map.flyTo({ center:x.p, zoom:15.8, offset:focusOffset(60, 40), ...view3d(55, -16), duration:1400 });
   popup = new maplibregl.Popup({ maxWidth:'280px', offset:16 }).setLngLat(x.p).setHTML(`<div class="pop">${html}</div>`).addTo(map);
 }
 function addPin(x, label, cls, html) {
@@ -370,7 +382,7 @@ function addPin(x, label, cls, html) {
   pins.push(new maplibregl.Marker({ element:el }).setLngLat(x.p).addTo(map));
 }
 // 遠景時花蓮市與玉里的編號會疊在一起，暫時錯開；拉近後回到實際位置
-const SPREAD = { '1':[-34,-24], '2':[-40,10], '3':[36,-18], '4':[34,16], '8':[-34,4], '9':[-8,-30], '10':[28,4] };
+const SPREAD = { '1':[-34,-24], '2':[-58,2], '3':[36,-18], '4':[34,16], '8':[-34,4], '9':[-8,-30], '10':[28,4] };
 function spreadPins() {
   const far = map.getZoom() < 10.5;
   pins.forEach(m => m.setOffset((far && SPREAD[m.getElement().textContent]) || [0,0]));
@@ -426,7 +438,8 @@ function setMode(next) {
   if (mode === 'hosp') renderHospitals(); else renderCare();
   spreadPins();
   const b = new maplibregl.LngLatBounds(); (mode === 'hosp' ? extra.hospitals : extra.care.flatMap(g => g.items)).forEach(x => x.p && b.extend(x.p));
-  map.fitBounds(b, { padding:{ top:Math.min(230, innerHeight*.27), bottom:sheetH() + 24, left:sideW() + 44, right:56 }, bearing:0, pitch:0, duration:1200 });
+  map.fitBounds(b, { padding:{ top:Math.min(230, innerHeight*.27), bottom:sheetH() + 24, left:sideW() + 44, right:56 }, ...view3d(45, -20), duration:1200 });
+  addTiltButton();
 }
 
 const extraData = fetch('extra.json').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).catch(() => null);
@@ -497,7 +510,7 @@ map.on('load', async () => {
   $('q').oninput = () => apply(false);
   $('q').onkeydown = e => { if (e.key === 'Enter') { apply(true); e.target.blur(); } };
   $('btnList').onclick = () => { const on = $('list').classList.toggle('on'); $('btnList').classList.toggle('on', on); $('btnList').setAttribute('aria-expanded', on); renderList(); };
-  $('btn3d').onclick = () => { tilted = !tilted; $('btn3d').textContent = tilted ? '平面' : '立體'; map.easeTo({ pitch:tilted?52:0, bearing:tilted?-14:0 }); };
+  $('btn3d').onclick = toggleTilt;
   apply(false);
   playShow();
   extra = await extraData;
