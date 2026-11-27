@@ -4,20 +4,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>花蓮牙醫診所地圖｜依山傍海，找到照顧笑容的地方</title>
-<meta name="description" content="花蓮縣 74 家健保特約牙醫診所地圖，特別標示頂好牙醫診所；可依鄉鎮、名稱、路名與看診時段查詢，另整理醫院牙科與巡迴、機構口腔照護資訊。">
+<meta name="description" content="花蓮縣 74 家健保特約牙醫診所地圖，可依鄉鎮、名稱、路名與看診時段查詢，另整理醫院牙科與巡迴、機構口腔照護資訊。">
 <link rel="canonical" href="https://maskywg.github.io/hualien-dental-map/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="花蓮牙醫診所地圖｜依山傍海，找到照顧笑容的地方">
-<meta property="og:description" content="花蓮縣 74 家健保特約牙醫診所地圖，特別標示頂好牙醫診所；可依鄉鎮、名稱、路名與看診時段查詢，另整理醫院牙科與巡迴、機構口腔照護資訊。">
-<meta property="og:image" content="https://maskywg.github.io/hualien-dental-map/og-image.jpg">
+<meta property="og:description" content="花蓮縣 74 家健保特約牙醫診所地圖，可依鄉鎮、名稱、路名與看診時段查詢，另整理醫院牙科與巡迴、機構口腔照護資訊。">
+<meta property="og:image" content="https://maskywg.github.io/hualien-dental-map/og-image.jpg?v=2">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://maskywg.github.io/hualien-dental-map/">
 <meta property="og:locale" content="zh_TW">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="花蓮牙醫診所地圖｜依山傍海，找到照顧笑容的地方">
-<meta name="twitter:description" content="花蓮縣 74 家健保特約牙醫診所地圖，特別標示頂好牙醫診所；可依鄉鎮、名稱、路名與看診時段查詢，另整理醫院牙科與巡迴、機構口腔照護資訊。">
-<meta name="twitter:image" content="https://maskywg.github.io/hualien-dental-map/og-image.jpg">
+<meta name="twitter:description" content="花蓮縣 74 家健保特約牙醫診所地圖，可依鄉鎮、名稱、路名與看診時段查詢，另整理醫院牙科與巡迴、機構口腔照護資訊。">
+<meta name="twitter:image" content="https://maskywg.github.io/hualien-dental-map/og-image.jpg?v=2">
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css">
 <style>
   :root { --ink:#17233b; --sub:#5b6880; --blue:#2563d9; --line:#d8dfec; --safe-b:env(safe-area-inset-bottom,0px); }
@@ -83,16 +83,7 @@
   .hud { background:rgba(255,255,255,.55); }
   .legend.off { visibility:hidden; }
   @media (prefers-reduced-motion:reduce) { .aurora,h1 span { animation:none; } }
-  #btnStar { flex:1.6; background:linear-gradient(100deg,#ffd45e,#ffab2e); border-color:#f0a020; color:#4a2a00; box-shadow:0 3px 14px rgba(255,170,30,.45); }
   #btnCounty,#btnCity { flex:1; }
-  .starpin { border:0; background:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; z-index:2; font-family:inherit; }
-  .starpin span { background:linear-gradient(100deg,#ffe27a,#ffb02e); color:#422500; font-weight:800; font-size:14px; padding:6px 13px; border-radius:999px; border:2px solid #fff; white-space:nowrap; box-shadow:0 5px 20px rgba(220,130,0,.55); animation:bob 2.2s ease-in-out infinite; }
-  .starpin i { font-style:normal; margin-right:4px; }
-  .starpin u { display:block; width:14px; height:14px; margin-top:6px; border-radius:50%; background:#ff9f1c; border:2px solid #fff; animation:halo 1.8s ease-out infinite; }
-  @keyframes bob { 50% { transform:translateY(-4px); } }
-  @keyframes halo { 0% { box-shadow:0 0 0 0 rgba(255,159,28,.75); } 100% { box-shadow:0 0 0 22px rgba(255,159,28,0); } }
-  .pop .badge { display:inline-block; font-size:11px; font-weight:800; background:#ffe6a3; color:#6b4100; border-radius:999px; padding:2px 9px; margin-bottom:6px; }
-  @media (prefers-reduced-motion:reduce) { .starpin span,.starpin u { animation:none; } }
   .maplibregl-popup { z-index:4; }
   .tabs { display:flex; gap:4px; padding:3px; border-radius:12px; background:#e9eefb; margin-bottom:8px; }
   .tabs button { flex:1; border:0; border-radius:9px; background:none; height:34px; font-size:14px; font-weight:700; color:var(--sub); cursor:pointer; white-space:nowrap; }
@@ -154,7 +145,7 @@
     .maplibregl-ctrl-top-right { top:12px; }
   }
   #extra .tilt { float:right; margin-left:8px; height:28px !important; font-size:12px; border-radius:999px; }
-  .pop .watch { display:block; width:100%; margin-top:8px; height:36px; border:0; border-radius:10px; cursor:pointer; font-family:inherit; font-size:13.5px; font-weight:800; color:#422500; background:linear-gradient(100deg,#ffd45e,#ffab2e); }
+  .pop .watch { display:block; margin-top:6px; padding:0; border:0; background:none; cursor:pointer; font-family:inherit; font-size:13px; color:var(--blue); text-decoration:underline; }
   #vdlg { margin:auto; padding:10px; border:0; border-radius:16px; background:#fff; box-shadow:0 24px 70px rgba(23,35,59,.4); max-width:calc(100vw - 20px); max-height:calc(100% - 16px); }
   #vdlg::backdrop { background:rgba(23,35,59,.5); }
   #vdlg .bar { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:8px; }
@@ -188,7 +179,6 @@
   </div>
   <div id="extra"></div>
   <div class="row clinic-only">
-    <button class="btn" id="btnStar">★ 頂好牙醫診所</button>
     <button class="btn" id="btnCounty">全縣</button>
     <button class="btn" id="btnCity">花蓮市區</button>
   </div>
@@ -204,7 +194,7 @@
   </div>
   <div id="list" class="clinic-only"></div>
   <div class="legend clinic-only" id="legend">光柱越高，診所越密集<span>疏</span><i></i><span>密</span><button class="btn" id="btnReplay" style="height:26px;font-size:11px;border-radius:999px">✦ 重播</button></div>
-  <details class="note"><summary>多數位置為推估，就診前請電話確認（資料說明）</summary>個人製作，非政府或健保署官方網站。診所資料：衛福部健保署「健保特約醫事機構-診所」，整理日期 2026-11-27；診所數不含自費診所、醫院與衛生所。醫院與巡迴・機構分頁為另外整理的資料，查證程度標示於各項目，醫院與衛生所座標取自 OpenStreetMap 或以鄰近門牌推估。座標以地址比對內政部國土測繪中心「查詢工商設施」的門牌點位，道路參考 OpenStreetMap；多數診所以鄰近門牌推估，導航請以地址為準。本圖特別標示頂好牙醫診所，不代表醫療品質評比。看診時段為健保登錄資料。</details>
+  <details class="note"><summary>多數位置為推估，就診前請電話確認（資料說明）</summary>個人製作，非政府或健保署官方網站。診所資料：衛福部健保署「健保特約醫事機構-診所」，整理日期 2026-11-27；診所數不含自費診所、醫院與衛生所。醫院與巡迴・機構分頁為另外整理的資料，查證程度標示於各項目，醫院與衛生所座標取自 OpenStreetMap 或以鄰近門牌推估。座標以地址比對內政部國土測繪中心「查詢工商設施」的門牌點位，道路參考 OpenStreetMap；多數診所以鄰近門牌推估，導航請以地址為準。看診時段為健保登錄資料。</details>
 </div>
 <script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>
 <script>
@@ -235,7 +225,7 @@ map.on('move', hud); setInterval(hud, 1000); hud();
 
 const geo = () => ({ type:'FeatureCollection', features:shown.filter(c => c.p).map(c => ({ type:'Feature', geometry:{type:'Point',coordinates:c.p}, properties:{i:c.i, n:c.n, r:c.r} })) });
 
-const STAR = '頂好牙醫診所';
+const VIDEOS = { '頂好牙醫診所':true };   // 有提供影片的診所
 const CALM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const HOME = { center:[121.50,23.73], zoom:innerWidth > 900 ? 8.9 : 8.75, pitch:48, bearing:-20 };
 
@@ -327,8 +317,8 @@ function openClinic(c) {
     ['上午','下午','晚上'].map((t,s) => `<tr><th>${t}</th>` + [...DAYS].map((_,d) => c.h[s*7+d] === '1' ? '<td class="y">●</td>' : '<td></td>').join('') + '</tr>').join('') + '</table>' : '<p>未登錄看診時段</p>';
   const tel = c.t.replace(/[^\d+#]/g, '');
   popup = new maplibregl.Popup({ maxWidth:'300px', offset:10 }).setLngLat(c.p).setHTML(
-    `<div class="pop${c.n === STAR ? ' star' : ''}">` + (c.n === STAR ? '<div class="badge">★ 本圖特別標示</div>' : '') + `<h2>${esc(c.n)}</h2><p>${esc(c.a)}</p>` + (c.t ? `<p>電話 <a href="tel:${tel}">${esc(c.t)}</a></p>` : '') +
-    (c.n === STAR ? '<button class="watch" onclick="playVideo()">▶ 看影片（31 秒・AI 情境演示）</button>' : '') +
+    `<div class="pop"><h2>${esc(c.n)}</h2><p>${esc(c.a)}</p>` + (c.t ? `<p>電話 <a href="tel:${tel}">${esc(c.t)}</a></p>` : '') +
+    (VIDEOS[c.n] ? '<button class="watch" onclick="playVideo()">看影片（31 秒・AI 情境演示）</button>' : '') +
     table + (c.m ? `<p>備註：${esc(c.m)}</p>` : '') + (c.x === 1 ? '<p>※ 位置依鄰近門牌推估，請以地址為準。</p>' : c.x === 2 ? '<p>※ 僅能確認在這條道路一帶，請務必依地址導航。</p>' : '') +
     `<p><a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.n + ' ' + c.a)}">用 Google 地圖導航 ↗</a></p></div>`).addTo(map);
 }
@@ -356,8 +346,8 @@ function districtLabels() {
 function renderList() {
   const box = $('list'); if (!box.classList.contains('on')) return;
   box.innerHTML = shown.length ? '' : '<p class="note">沒有符合的診所，請放寬條件。</p>';
-  [...shown].sort((a,b) => (b.n === STAR) - (a.n === STAR)).forEach(c => {
-    const b = document.createElement('button'); b.className = 'item'; b.innerHTML = `<b>${c.n === STAR ? '★ ' : ''}${esc(c.n)}</b><span>${esc(c.a)}</span>`;
+  shown.forEach(c => {
+    const b = document.createElement('button'); b.className = 'item'; b.innerHTML = `<b>${esc(c.n)}</b><span>${esc(c.a)}</span>`;
     b.onclick = () => go(c); box.appendChild(b);
   });
 }
@@ -386,7 +376,7 @@ function addTiltButton() {
   $('extra').prepend(b);
 }
 /* 醫院牙科、巡迴與機構照護分頁 */
-let mode = 'clinic', extra = null, pins = [], starMarker = null;
+let mode = 'clinic', extra = null, pins = [];
 const mapLink = (n, a) => `<a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(n + ' ' + a)}">Google 地圖 ↗</a>`;
 const telLink = t => `<a href="tel:${t.replace(/[^\d]/g, '')}">${esc(t)}</a>`;
 function showSpot(x, html) {
@@ -449,8 +439,7 @@ function setMode(next) {
   const clinic = mode === 'clinic';
   $('panel').classList.toggle('alt', !clinic);
   $('panel').classList.toggle('care', mode === 'care');
-  ['pillar','beacon','glow','dot','spark','name'].forEach(id => { if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', clinic ? 'visible' : 'none'); });
-  if (starMarker) starMarker.getElement().style.display = clinic ? '' : 'none';
+  ['pillar','glow','dot','spark','name'].forEach(id => { if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', clinic ? 'visible' : 'none'); });
   districtLabels();
   if (clinic) { apply(true); return; }
   if (mode === 'hosp') renderHospitals(); else renderCare();
@@ -484,17 +473,6 @@ map.on('load', async () => {
     'circle-opacity':['interpolate',['linear'],['zoom'],11.4,.35,13.2,1], 'circle-stroke-opacity':['interpolate',['linear'],['zoom'],11.4,.35,13.2,1], 'circle-stroke-width':['interpolate',['linear'],['zoom'],10,.8,16,2.5] } });
   map.addLayer({ id:'spark', type:'circle', source:'clinics', filter:SPARK, paint:{ 'circle-color':'rgba(0,0,0,0)', 'circle-radius':6, 'circle-stroke-color':'#7a4ddb', 'circle-stroke-width':1.6, 'circle-stroke-opacity':0 } }, 'dot');
   setInterval(pulse, 60);
-  const star = all.find(c => c.n === STAR);
-  if (star) {
-    const [x, y] = star.p, R = 520;
-    const ring = Array.from({length:11}, (_,i) => { const t = Math.PI/5 * i - Math.PI/2, k = i % 2 ? R*.45 : R; return [x + k*Math.cos(t)/KX, y - k*Math.sin(t)/KY]; });
-    map.addSource('beacon', { type:'geojson', data:{ type:'Feature', properties:{}, geometry:{ type:'Polygon', coordinates:[ring] } } });
-    map.addLayer({ id:'beacon', type:'fill-extrusion', source:'beacon', maxzoom:11.9, paint:{ 'fill-extrusion-color':'#ffb703', 'fill-extrusion-height':['interpolate',['linear'],['zoom'], 8, 22000, 11, 4200], 'fill-extrusion-opacity':.9 } });
-    const el = document.createElement('button'); el.className = 'starpin'; el.innerHTML = '<span><i>★</i>' + STAR + '</span><u></u>'; el.setAttribute('aria-label', STAR);
-    el.onclick = e => { e.stopPropagation(); stopShow(); go(star); };
-    starMarker = new maplibregl.Marker({ element:el, anchor:'bottom', offset:[0,7] }).setLngLat(star.p).addTo(map);
-    $('btnStar').onclick = () => go(star);
-  }
   const view = v => { popup?.remove(); map.flyTo({ ...v, duration:1600 }); };
   $('btnCounty').onclick = () => view(HOME);
   $('btnCity').onclick = () => view({ center:[121.600,23.980], zoom:12.6, pitch:tilted?55:0, bearing:tilted?-16:0 });

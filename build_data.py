@@ -139,4 +139,3 @@ res.sort(key=lambda c:(c['d']!='花蓮市',c['d']!='吉安鄉',c['d'],c['n']))
 out={'updated':'2026-11-27','clinics':[{k:c[k] for k in ('n','a','t','d','h','m','p','x')} for c in res]}
 D=OUT; os.makedirs(D,exist_ok=True)
 json.dump(out,open(D+'/clinics.json','w',encoding='utf-8'),ensure_ascii=False,separators=(',',':'))
-print([(c['n'],c['a'],c['p'],c['x'],c['h']) for c in out['clinics'] if c['n']=='頂好牙醫診所'])
